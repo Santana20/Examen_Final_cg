@@ -76,10 +76,12 @@ public:
 		model = glm::rotate(model, (float)M_PI, {0.0f, 1.0f, 0.0f});
         //rotate x
 		model = glm::rotate(model, (float)M_PI / 2, {-1.0f, 0.0f, 0.0f});
-		model = glm::scale(model, glm::vec3(value_scale));
+		model = glm::scale(model, glm::vec3(0.2f));
 
 		shader->setMat4("model", model);
 
 		playerNave->Draw(shader);
     }
 };
+
+#endif
