@@ -22,8 +22,10 @@ Files* files;
 Shader* shader;
 GameObject* playerNave;
 
+const float width_game = 7.0f;
+
 // Initial velocity of the player
-const float PLAYER_VELOCITY(500.0f);
+const float PLAYER_VELOCITY(2.0f);
 
 const glm::vec2 PLAYER_SIZE(100.0f, 100.0f);
 
@@ -46,13 +48,13 @@ public:
     // initialize game state (load all shaders/textures/levels)
     void Init()
     {
-        cam = new Cam(glm::vec3(0.0f, 0.0f, 5.0f));
+        cam = new Cam(glm::vec3(0.0f, 3.5f, 10.0f));
 
         files = new Files("bin", "resources/textures", "resources/objects");
 
         shader = new Shader(files, "shader.vert", "shader.frag");
 
-        glm::vec2 playerPos = glm::vec2(this->Width / 2.0f - PLAYER_SIZE.x / 2.0f, this->Height - PLAYER_SIZE.y);
+        glm::vec2 playerPos = glm::vec2(0.0f, 0.0f);
         Model* playerModel = new class Model(files, "nave/nave.obj");
         playerNave = new GameObject(playerPos, PLAYER_SIZE, playerModel);
                 
@@ -66,22 +68,28 @@ public:
             // move playerboard
             if (this->Keys[GLFW_KEY_A])
             {
-                if (playerNave->Position.x >= 0.0f)
+                if (playerNave->Position.x >= -width_game)
                 {
                     playerNave->Position.x -= velocity;
+                    
                 }
             }
             if (this->Keys[GLFW_KEY_D])
             {
-                if (playerNave->Position.x <= this->Width - playerNave->Size.x)
+                if (playerNave->Position.x <= width_game)
                 {
                     playerNave->Position.x += velocity;
                 }
             }
         }
     }
-    void Update(float currentFrame)
+    void Update(float dt)
     {
+        
+    }
+    void Render(float currentFrame)
+    {
+
         glm::vec3 lightPos   = glm::vec3(1.0f);
 	    glm::vec3 lightColor = glm::vec3(1.0f);
 
@@ -94,16 +102,14 @@ public:
 		glm::mat4 proj = glm::perspective(cam->zoom, (f32)Width / (f32)Height, 0.1f, 100.0f);
 		shader->setMat4("proj", proj);
 		shader->setMat4("view", cam->getViewM4());
-    }
-    void Render()
-    {
+
         glm::mat4 model = glm::mat4(1.0f);
-		model = translate(model, glm::vec3(0.0f, 0.0f, -2.0f));
+		model = translate(model, glm::vec3(playerNave->Position, 0.0f));
         //rotate y
 		model = glm::rotate(model, (float)M_PI, {0.0f, 1.0f, 0.0f});
         //rotate x
 		model = glm::rotate(model, (float)M_PI / 2, {-1.0f, 0.0f, 0.0f});
-		model = glm::scale(model, glm::vec3(0.2f));
+		model = glm::scale(model, glm::vec3(0.1f));
 
 		shader->setMat4("model", model);
 

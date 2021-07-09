@@ -6,8 +6,25 @@ const u32 SCR_HEIGHT = 720;
 
 f32  deltaTime  = 0.0f;
 f32  lastFrame  = 0.0f;
-bool wireframe  = false;
+Game game(SCR_WIDTH, SCR_HEIGHT);
 
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
+{
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+    if (key >= 0 && key < 1024)
+    {
+        if (action == GLFW_PRESS)
+            game.Keys[key] = true;
+        else if (action == GLFW_RELEASE)
+        {
+            game.Keys[key] = false;
+            //game.KeysProcessed[key] = false;
+        }
+    }
+}
+
+/*
 void processInput(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
@@ -25,9 +42,8 @@ void processInput(GLFWwindow* window) {
 		cam->processKeyboard(RIGHT, deltaTime);
 	}
 }
-void key_callback(GLFWwindow*, int key, int, int act, int) {
-	wireframe ^= key == GLFW_KEY_E && act == GLFW_PRESS;
-}
+*/
+
 void mouse_callback(GLFWwindow* window, f64 xpos, f64 ypos) {
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
 		cam->movePov(xpos, ypos);
@@ -45,7 +61,7 @@ i32 main() {
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
 
-    Game game(SCR_WIDTH, SCR_HEIGHT);
+    //Game game(SCR_WIDTH, SCR_HEIGHT);
 
     game.Init();
 
@@ -56,17 +72,16 @@ i32 main() {
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		processInput(window);
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glPolygonMode(GL_FRONT_AND_BACK, wireframe? GL_LINE: GL_FILL);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 		game.ProcessInput(deltaTime);
 
-        game.Update(currentFrame);
+        game.Update(deltaTime);
 
-		game.Render();
+		game.Render(currentFrame);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
