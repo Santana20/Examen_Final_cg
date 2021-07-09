@@ -62,7 +62,7 @@ i32 main() {
 
 		glPolygonMode(GL_FRONT_AND_BACK, wireframe? GL_LINE: GL_FILL);
 
-		game.ProcessInput(currentFrame);
+		game.ProcessInput(deltaTime);
 
         game.Update(currentFrame);
 

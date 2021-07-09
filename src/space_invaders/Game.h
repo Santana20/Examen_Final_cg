@@ -7,6 +7,7 @@
 #include <files.hpp>
 #include <model.hpp>
 #include <cam.hpp>
+#include "GameObject.h"
 
 // Represents the current state of the game
 enum GameState {
@@ -19,8 +20,12 @@ enum GameState {
 Cam* cam;
 Files* files;
 Shader* shader;
-class Model* playerNave;
+GameObject* playerNave;
 
+// Initial velocity of the player
+const float PLAYER_VELOCITY(500.0f);
+
+const glm::vec2 PLAYER_SIZE(100.0f, 100.0f);
 
 class Game
 {
@@ -46,12 +51,34 @@ public:
         files = new Files("bin", "resources/textures", "resources/objects");
 
         shader = new Shader(files, "shader.vert", "shader.frag");
-        playerNave = new class Model(files, "nave/nave.obj");
+
+        glm::vec2 playerPos = glm::vec2(this->Width / 2.0f - PLAYER_SIZE.x / 2.0f, this->Height - PLAYER_SIZE.y);
+        Model* playerModel = new class Model(files, "nave/nave.obj");
+        playerNave = new GameObject(playerPos, PLAYER_SIZE, playerModel);
+                
     }
     // game loop
-    void ProcessInput(float currentFrame)
+    void ProcessInput(float dt)
     {
-        
+        if (this->State == GAME_ACTIVE)
+        {
+            float velocity = PLAYER_VELOCITY * dt;
+            // move playerboard
+            if (this->Keys[GLFW_KEY_A])
+            {
+                if (playerNave->Position.x >= 0.0f)
+                {
+                    playerNave->Position.x -= velocity;
+                }
+            }
+            if (this->Keys[GLFW_KEY_D])
+            {
+                if (playerNave->Position.x <= this->Width - playerNave->Size.x)
+                {
+                    playerNave->Position.x += velocity;
+                }
+            }
+        }
     }
     void Update(float currentFrame)
     {
