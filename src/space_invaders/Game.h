@@ -75,7 +75,7 @@ public:
         for (int i = 0; i < max_enemies - 5; i++)
         {
             int pos_x = -int(width_game) + (rand() % (2 * int(width_game) + 1));
-            positions_enemies.push_back(glm::vec2(float(pos_x), width_game + 10.0f));
+            positions_enemies.push_back(glm::vec2(float(pos_x), width_game));
         }
 
         Model* enemyModel = new class Model(files, "monster/monster.obj");
@@ -134,7 +134,7 @@ public:
                 for (int i = 0; i < (max_enemies - int(positions_enemies.size())); i++)
                 {
                     int pos_x = -int(width_game) + (rand() % (2 * int(width_game) + 1));
-                    positions_enemies.push_back(glm::vec2(float(pos_x), 5.0f));
+                    positions_enemies.push_back(glm::vec2(float(pos_x), width_game));
                 }
                 cont = 0;
             }
