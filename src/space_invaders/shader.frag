@@ -33,6 +33,3 @@ void main() {
 	vec3 result    = (ambient + diffuse + specular) * vec3(1.0f);
 	color          = texture(texture_diffuse1, texCoords) * vec4(result, 1.0);
 }
-
-/* vim: set tabstop=2:softtabstop=2:shiftwidth=2:noexpandtab */
-

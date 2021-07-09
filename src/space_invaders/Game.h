@@ -17,8 +17,6 @@ enum GameState {
     GAME_OVER
 };
 
-
-
 Cam* cam;
 Files* files;
 Shader* shader;
@@ -56,7 +54,7 @@ public:
 	    delete playerNave;
         delete files;
     }
-    // initialize game state (load all shaders/textures/levels)
+
     void Init()
     {
         cam = new Cam(glm::vec3(0.0f, 3.5f, 10.0f));

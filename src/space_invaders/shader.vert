@@ -18,6 +18,3 @@ void main() {
 
 	gl_Position = proj * view * vec4(pos, 1.0);
 }
-
-/* vim: set tabstop=2:softtabstop=2:shiftwidth=2:noexpandtab */
-
