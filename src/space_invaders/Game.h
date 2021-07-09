@@ -1,6 +1,8 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include<stdlib.h>
+#include<time.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -21,13 +23,22 @@ Cam* cam;
 Files* files;
 Shader* shader;
 GameObject* playerNave;
+GameObject* enemy;
+std::vector<glm::vec2> positions_enemies;
+const int max_enemies = 15;
+
 
 const float width_game = 7.0f;
 
-// Initial velocity of the player
+// player
 const float PLAYER_VELOCITY(2.0f);
+const glm::vec2 PLAYER_SIZE(5.0f, 5.0f);
 
-const glm::vec2 PLAYER_SIZE(100.0f, 100.0f);
+// enemy
+const float ENEMY_VELOCITY(1.5f);
+const glm::vec2 ENEMY_SIZE(3.0f, 3.0f);
+const int spawn_time = 30;
+int cont = 0;
 
 class Game
 {
@@ -54,10 +65,21 @@ public:
 
         shader = new Shader(files, "shader.vert", "shader.frag");
 
+        // player
         glm::vec2 playerPos = glm::vec2(0.0f, 0.0f);
         Model* playerModel = new class Model(files, "nave/nave.obj");
         playerNave = new GameObject(playerPos, PLAYER_SIZE, playerModel);
-                
+
+        //enemies
+        srand(time(NULL));
+        for (int i = 0; i < max_enemies - 5; i++)
+        {
+            int pos_x = -int(width_game) + (rand() % (2 * int(width_game) + 1));
+            positions_enemies.push_back(glm::vec2(float(pos_x), width_game + 10.0f));
+        }
+
+        Model* enemyModel = new class Model(files, "monster/monster.obj");
+        enemy = new GameObject(positions_enemies[0], ENEMY_SIZE, enemyModel);
     }
     // game loop
     void ProcessInput(float dt)
@@ -85,7 +107,39 @@ public:
     }
     void Update(float dt)
     {
-        
+        if (this->State == GAME_ACTIVE)
+        {
+            float velocity = ENEMY_VELOCITY * dt;
+            // change positions of enemies
+            for (int i = 0; i < (int)positions_enemies.size(); ++i)
+            {
+                if (positions_enemies[i].y >= 0.0f) positions_enemies[i].y -= velocity;
+            }
+
+            // validate if enemy is out of limit
+            for (int i = 0; i < (int)positions_enemies.size();)
+            {
+                glm::vec2 pos = positions_enemies[i];
+                if (pos.y >= 0.0f) ++i;
+                else 
+                {
+                    positions_enemies.erase(positions_enemies.begin() + i);
+                }
+            }
+
+            // added necessary number of enemies
+            if (cont == spawn_time)
+            {
+                srand(time(NULL));
+                for (int i = 0; i < (max_enemies - int(positions_enemies.size())); i++)
+                {
+                    int pos_x = -int(width_game) + (rand() % (2 * int(width_game) + 1));
+                    positions_enemies.push_back(glm::vec2(float(pos_x), 5.0f));
+                }
+                cont = 0;
+            }
+            else cont++;
+        }
     }
     void Render(float currentFrame)
     {
@@ -102,6 +156,16 @@ public:
 		glm::mat4 proj = glm::perspective(cam->zoom, (f32)Width / (f32)Height, 0.1f, 100.0f);
 		shader->setMat4("proj", proj);
 		shader->setMat4("view", cam->getViewM4());
+
+        for (int i = 0; i < (int)positions_enemies.size(); ++i)
+        {
+            glm::mat4 model = glm::mat4(1.0f);
+			model = glm::translate(model, glm::vec3(positions_enemies[i], 0.0f));
+            model = glm::scale(model, glm::vec3(0.1f));
+            shader->setMat4("model", model);
+
+            enemy->Draw(shader);
+        }
 
         glm::mat4 model = glm::mat4(1.0f);
 		model = translate(model, glm::vec3(playerNave->Position, 0.0f));
